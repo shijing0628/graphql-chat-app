@@ -1,8 +1,8 @@
-const { Message, User } = require("../models");
+const { User } = require("../../models");
 const bcrypt = require("bcrypt");
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = require("../config/env.json");
+const { JWT_SECRET } = require("../../config/env.json");
 const { Op } = require("sequelize");
 
 // A map of functions which return data for the schema.
@@ -23,6 +23,7 @@ module.exports = {
         throw err;
       }
     },
+
     login: async (_, args) => {
       const { username, password } = args;
       let errors = {};
@@ -65,6 +66,7 @@ module.exports = {
       }
     },
   },
+
   Mutation: {
     register: async (_, args) => {
       let { username, email, password, confirmPassword } = args;
@@ -112,29 +114,6 @@ module.exports = {
           err.errors.forEach((e) => (errors[e.path] = e.message));
         }
         throw new UserInputError("bad input", { errors });
-      }
-    },
-    sendMessage: async (parent, { to, content }, { user }) => {
-      try {
-        if (!user) throw new AuthenticationError("unauthanticated");
-
-        const recipient = await User.findOne({ where: { username: to } });
-        if (!recipient) {
-          throw new UserInputError("user not found");
-        }
-        if (content.trim() === "") {
-          throw new UserInputError("message is empty!");
-        }
-
-        const message = await Message.create({
-          from: user.username,
-          to,
-          content,
-        });
-        return message;
-      } catch (err) {
-        console.log(err);
-        throw err;
       }
     },
   },
