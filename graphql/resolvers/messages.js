@@ -1,35 +1,42 @@
-const { UserInputError, AuthenticationError } = require("apollo-server");
+const { UserInputError, AuthenticationError,PubSub,withFilter } = require("apollo-server");
 const { Op } = require("sequelize");
 
 const { Message, User } = require("../../models");
+
+
 
 module.exports = {
   Query: {
     getMessages: async (parent, { from }, { user }) => {
       try {
+        if (!user) throw new AuthenticationError('Unauthenticated')
+
         const otherUser = await User.findOne({
           where: { username: from },
-        });
-        if (!otherUser) throw new UserInputError("User not found");
+        })
+        if (!otherUser) throw new UserInputError('User not found')
 
-        const usernames = [user.username, otherUser.username];
+       const usernames = [user.username, otherUser.username]
+     
         const messages = await Message.findAll({
           where: {
             from: { [Op.in]: usernames },
             to: { [Op.in]: usernames },
           },
-          order: [["createdAt", "DESC"]],
-        });
+          order: [['createdAt', 'DESC']],
+        })
+        
+         
         return messages;
+
       } catch (err) {
-        console.log(err);
-        throw err;
+        console.log(err)
+        throw err
       }
     },
   },
-
   Mutation: {
-    sendMessage: async (parent, { to, content }, { user }) => {
+    sendMessage: async (parent, { to, content }, { user,pubsub }) => {
       try {
         if (!user) throw new AuthenticationError("Unauthenticated");
 
@@ -51,6 +58,8 @@ module.exports = {
           content,
         });
 
+        pubsub.publish('NEW_MESSAGE', {newMessage:message})
+
         return message;
       } catch (err) {
         console.log(err);
@@ -58,4 +67,19 @@ module.exports = {
       }
     },
   },
+  Subscription:{
+    newMessage:{
+      subscribe: withFilter((_,__,{pubsub,user})=>{
+        if(!user) throw new AuthenticationError("Unauthenticated");
+        return pubsub.asyncIterator(['NEW_MESSAGE'])
+      },({newMessage},_,{user})=>{
+        if(newMessage.from === user.username || newMessage.to === user.username){
+         return true
+        } else {
+          return false
+        }
+       
+      })
+    }
+  }
 };

@@ -5,9 +5,7 @@ module.exports = {
   Message: {
     createdAt: (parent) => parent.createdAt.toISOString(),
   },
-  // User: {
-  //   createdAt: (parent) => parent.createdAt.toISOString(),
-  // },
+
   Query: {
     ...userResolvers.Query,
     ...messageResolvers.Query,
@@ -16,4 +14,7 @@ module.exports = {
     ...userResolvers.Mutation,
     ...messageResolvers.Mutation,
   },
+  Subscription:{
+    ...messageResolvers.Subscription
+  }
 };
