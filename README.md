@@ -26,3 +26,5 @@ frontend repo link: https://github.com/shijing0628/graphql-chat-app-client
   https://www.youtube.com/watch?v=aieNcEqCLHg&list=PLMhAeHCz8S3_VYiYxpcXtMz96vePOuOX3&index=3
   <br>
   http://www.semlinker.com/node-sequelize-quickstart/
+  <br>
+  ![](2021-02-10-08-54-45.png)
