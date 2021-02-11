@@ -22,6 +22,7 @@ frontend repo link: https://github.com/shijing0628/graphql-chat-app-client
 - sequelize db:migrate:undo:all (for seeds)
 - sequelize db:seed:all
 - sequelize model:generate --name Message --attributes content:String,uuid:uuid,from:string,to:string (cli create a message table)
+- nodemon server.js --ignore client/ in packaga.json to make front end changing won't effect backend rerun
   <br>
   https://www.youtube.com/watch?v=aieNcEqCLHg&list=PLMhAeHCz8S3_VYiYxpcXtMz96vePOuOX3&index=3
   <br>
